@@ -22,11 +22,9 @@ class Perceptron:
 
         # Додатковий прихований шар
         self.W2 = np.random.randn(self.hidden_size, self.output_size) * np.sqrt(self.hidden_size)
-        self.b2 = np.zeros((1, self.hidden_size))
+        self.b2 = np.zeros((1, self.output_size))
 
-        # Вихідний шар
-        self.W3 = np.random.randn(self.hidden_size, self.output_size) * np.sqrt(self.hidden_size)
-        self.b3 = np.zeros((1, self.output_size))
+
 
 
         # Список для збереження втрат під час навчання
@@ -50,13 +48,10 @@ class Perceptron:
         self.Z1 = np.dot(X, self.W1) + self.b1 # Лінійне перетворення
         self.A1 = self.sigmoid(self.Z1) # Активація
 
-        self.Z2 = np.dot(self.A1, self.W2) + self.b2  # Лінійне перетворення
-        self.A2 = self.sigmoid(self.Z2)  # Активація
+        self.Z2 = np.dot(self.A1, self.W2) + self.b2 # Лінійне перетворення
+        self.A2 = self.softmax(self.Z2)
 
-        self.Z3 = np.dot(self.A2, self.W3) + self.b3 # Лінійне перетворення
-        self.A3 = self.softmax(self.Z3)
-
-        return self.A3
+        return self.A2
 
     def compute_loss(self, y_true, y_pred):
         m = y_true.shape[0] # Кількість зразків
@@ -72,13 +67,7 @@ class Perceptron:
         m = X.shape[0]
 
         # Обраховуємо помилку вихідного шару
-        dZ3 = y_pred - y_true
-        dW3 = np.dot(self.A2.T, dZ3) / m
-        db3 = np.sum(dZ3, axis=0, keepdims=True) / m
-
-        # Обраховуємо помилку другого прихованого шару
-        dA2 = np.dot(dZ3, self.W3.T)
-        dZ2 = dA2 * self.sigmoid_derivative(self.A2)  # Похідна сигмоїди
+        dZ2 = y_pred - y_true
         dW2 = np.dot(self.A1.T, dZ2) / m
         db2 = np.sum(dZ2, axis=0, keepdims=True) / m
 
@@ -86,15 +75,13 @@ class Perceptron:
         dA1 = np.dot(dZ2, self.W2.T)
         dZ1 = dA1 * self.sigmoid_derivative(self.A1)  # Похідна сигмоїди
         dW1 = np.dot(X.T, dZ1) / m # Похідна сигмоїди
-        db1 = np.sum(dZ1, axis=0, keepdims=True) / m
+        dbw = np.sum(dZ1, axis=0, keepdims=True) / m
 
         # Оновлюємо ваги та зсуви
-        self.W3 -= self.learning_rate * dW3
-        self.b3 -= self.learning_rate * db3
         self.W2 -= self.learning_rate * dW2
         self.b2 -= self.learning_rate * db2
         self.W1 -= self.learning_rate * dW1
-        self.b1 -= self.learning_rate * db2
+        self.b1 -= self.learning_rate * dbw
 
     def caluclate_accuracy(self, y_true, y_pred):
         y_true_labels = np.argmax(y_true, axis=1)
