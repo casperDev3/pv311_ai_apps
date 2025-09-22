@@ -14,6 +14,8 @@ import os
 
 # Перевірка наявності GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
 
 # Визначення трансформацій для даних
 transform_train = transforms.Compose([
@@ -28,7 +30,7 @@ transform_train = transforms.Compose([
 transform_test = transforms.Compose([
     transforms.Resize((224, 224)), # зміна розміру зображень
     transforms.ToTensor(), # перетворення зображень у тензори
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 ]) # трансформації для тестових даних
 
 # Створення датасету котиків з CIFAR-10
@@ -49,18 +51,6 @@ class CatDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return self.data[idx], self.labels[idx]
-
-# Завантаження  CIFAR-10 датасету
-cifar_train = CIFAR10(root='./data', train=True, download=True, transform=transform_train)
-cifar_test = CIFAR10(root='./data', train=False, download=True, transform=transform_test)
-
-# Створення датасетів котиків
-train_dataset = CatDataset(cifar_train)
-test_dataset = CatDataset(cifar_test)
-
-# Створення DataLoader для тренувального та тестового наборів
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=2) # batch_size - це кількість зразків, що обробляються одночасно, shuffle=True для випадкового перемішування даних
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=2)
 
 # Архітектура моделі (проста CNN)
 class CatDetectionCNN(nn.Module):
@@ -117,3 +107,99 @@ class CatDetectionCNN(nn.Module):
         x = self.conv_layers(x) # проходження через конволюційні шари
         x = self.classifier(x) # проходження через повнозв'язні шари
         return x
+
+# Завантаження  CIFAR-10 датасету
+cifar_train = CIFAR10(root='./data', train=True, download=True, transform=transform_train)
+cifar_test = CIFAR10(root='./data', train=False, download=True, transform=transform_test)
+
+
+# Створення датасетів котиків
+train_dataset = CatDataset(cifar_train)
+test_dataset = CatDataset(cifar_test)
+
+# Створення DataLoader для тренувального та тестового наборів
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=2) # batch_size - це кількість зразків, що обробляються одночасно, shuffle=True для випадкового перемішування даних
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=2)
+
+print("test")
+
+
+# ініціалізація моделі
+model = CatDetectionCNN().to(device) # перенесення моделі на GPU або CPU
+print(f"Модель створена з {sum(p.numel() for p in model.parameters() if p.requires_grad)} параметрами.")
+
+# Визначення функції втрат та оптимізатора
+criterion = nn.CrossEntropyLoss() # функція втрат для багатокласової класифікації
+optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4) # оптимізатор Adam з початковою швидкістю навчання 0.001
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1) # зменшення швидкості навчання кожні 10 епох в 10 разів
+
+# Функція для тренування моделі
+def train_model(model, train_loader, test_loader, num_epoch=20):
+    train_loses = [] # список для збереження втрат на тренувальному наборі
+    train_accuracies = [] # список для збереження точності на тренувальному наборі
+    test_accuracies = [] # список для збереження точності на тестовому наборі
+
+    for epoch in range(num_epoch): # цикл по епохах
+        model.train() # встановлення моделі в режим тренування
+        running_loss = 0.0
+        correct_train = 0
+        total_train = 0
+
+        for batch_idx, (data, labels) in enumerate(train_loader):
+            data, target = data.to(device), labels.to(device) # перенесення даних на GPU або CPU
+
+            optimizer.zero_grad() # обнулення градієнтів
+            outputs = model(data) # проходження вперед
+            loss = criterion(outputs, target) # обчислення втрат
+            loss.backward() # зворотнє поширення
+            optimizer.step() # оновлення ваг
+
+            running_loss += loss.item() # накопичення втрат
+            _, predicted = torch.max(outputs.data, 1) # отримання передбачених міток
+            total_train += target.size(0) # загальна кількість зразків
+            correct_train += (predicted == target).sum().item() # кількість правильних передбачень
+
+            if batch_idx % 50 == 0:
+                print(f"Epoch [{epoch+1}/{num_epoch}], Batch [{batch_idx+1}/{len(train_loader)}], Loss: {loss.item():.4f}")
+
+            # Обчислення точності на тренувальному наборі
+        train_accuracy = 100 * correct_train / total_train
+        train_accuracies.append(train_accuracy)
+
+        # Тестування моделі на тестовому наборі
+        model.eval() # встановлення моделі в режим оцінки
+        correct_test = 0
+        total_test = 0
+
+        with torch.no_grad(): # відключення обчислення градієнтів
+            for data, target in test_loader:
+                data, target = data.to(device), target.to(device) # перенесення даних на GPU або CPU
+                outputs = model(data) # проходження вперед
+                _, predicted = torch.max(outputs.data, 1) # отримання передбачених міток
+                total_test += target.size(0)
+                correct_test += (predicted == target).sum().item()
+
+        test_accuracy = 100 * correct_test / total_test
+
+        train_loses.append(running_loss / len(train_loader)) # середня втрата за епоху
+        test_accuracies.append(test_accuracy)
+        train_accuracies.append(train_accuracy)
+
+        print(f'Epoch [{epoch+1}/{num_epoch}]'
+              f', Loss: {running_loss / len(train_loader):.4f}'
+              f', Train Accuracy: {train_accuracy:.2f}%'
+              f', Test Accuracy: {test_accuracy:.2f}%')
+        print("-" * 50)
+
+        scheduler.step() # оновлення швидкості навчання
+
+    return  train_loses, train_accuracies, test_accuracies
+
+# Тренування моделі
+train_losses, train_accuracies, test_accuracies = train_model(model, train_loader, test_loader, num_epoch=20)
+
+# Збереження моделі
+model_path = "saved_model/cat_detection_cnn.pth"
+torch.save(model.state_dict(), model_path)
+print(f"Модель збережена за шляхом: {model_path}")
+
