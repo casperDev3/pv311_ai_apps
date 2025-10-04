@@ -182,7 +182,7 @@ def run_face_recognition(camera_id=0, photos_folder="photos"):
         # Показуємо кадр
         cv2.imshow('Face Recognition', frame)
 
-        key = cv2.waitKey(1) & 0xFF
+        cv2.waitKey(1) & 0xFF
 
     cap.release()
     cv2.destroyAllWindows()
