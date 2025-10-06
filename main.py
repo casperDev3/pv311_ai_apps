@@ -6,6 +6,7 @@ import tempfile
 import platform
 import subprocess
 
+
 # ---  Конфік ----
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or ""
 if not GROQ_API_KEY:
@@ -29,12 +30,12 @@ def play_audio(path):
 def listen_ukrainian(timeout = 5, phrase_time_limit=20):
     r = sr.Recognizer() # розпізнавач мови
 
-    with sr.Microphone(device_index=10) as source:
+    with sr.Microphone(device_index=7) as source:
         print("Говори щось українською!")
         print(sr.Microphone.list_microphone_names())
         r.adjust_for_ambient_noise(source, duration=0.8)
         try:
-            audio =  r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+            audio = r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
         except sr.WaitTimeoutError:
             print("Нічого не почув!")
             return None
@@ -80,7 +81,38 @@ def ask_groq(prompt = "test", system="Ти - розумний і добрози�
          print("Помилка при запиті", err)
          return "Вибач сталась помилка! При запиті до ШІ!"
 
+def speak_ua(text):
+    if not text:
+        return
+    try:
+        tts = gTTS(text=text, lang="uk")
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as fp:
+            path = fp.name
+        tts.save(path)
+        play_audio(path)
+        # close player
+        # kill process
+        os.remove(path)
+    except Exception as e:
+        print("Не вдалось озвучити!", e)
+
+def main():
+    print("Привіт мене звати Джарвіс! Питай!")
+    while True:
+        query = listen_ukrainian()
+        if not query:
+            continue
+        print("Думаю ...")
+
+        if query.lower().strip() in ["вийти", "дякую", "завершити"]:
+            print("бувай")
+            speak_ua("бувай")
+            break
+
+        answer = ask_groq(query)
+        print("Відповідь: ", answer)
+        speak_ua(answer)
+
+
 if __name__ == "__main__":
-    query = listen_ukrainian()
-    answer = ask_groq(query)
-    print(answer)
+    main()
