@@ -7,7 +7,7 @@ import platform
 import subprocess
 
 # ---  Конфік ----
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or "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"
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or ""
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY is not set")
 
