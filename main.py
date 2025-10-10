@@ -1,6 +1,7 @@
 import torch
 from diffusers import StableDiffusionPipeline
 import os
+import time
 
 MODEL_CACHE_DIR = "./models/stable-diffusion"
 MODEL_ID = "runwayml/stable-diffusion-v1-5"
@@ -20,9 +21,8 @@ def download_model():
             torch_dtype=torch.float16,
             safety_checker=None,
             use_safetensors=True,
-            low_cpu_mem_usage=True,  # Use this instead of offload_state_dict
-            variant="fp16",  # Explicitly request fp16 variant
-            # offload_state_dict=
+            low_cpu_mem_usage=True,
+            variant="fp16",
         )
 
         # Save the pipeline to the cache directory
@@ -55,7 +55,9 @@ def load_model():
         torch_dtype=torch.float16 if device == "cuda" else torch.float32,
         safety_checker=None,
         local_files_only=local,
-        use_safetensors=True
+        use_safetensors=True,
+        low_cpu_mem_usage=True,
+        variant="fp16"
     )
     pipe = pipe.to(device)
 
@@ -64,12 +66,13 @@ def load_model():
 
     return pipe
 
-def generate_image(pipe, prompt, out_paths="gen_images/gen_img.png", steps=30, guidance=7.5):
+def generate_image(pipe, prompt, out_paths="gen_images/gen_img_1.png", steps=30, guidance=7.5):
     print("Generation....")
 
     image = pipe(prompt, num_inference_steps=steps, guidance_scale=guidance).images[0]
     image.save(out_paths)
-
+    # TO-DO: Find name methood
+    # arr["result"].fx() = "result" , arr[0]
     print("Image generated successfully!")
     return image
 
@@ -77,7 +80,7 @@ def main():
     prompt = input("Enter prompt: ")
     try:
         pipe = load_model()
-        generate_image(pipe, prompt)
+        generate_image(pipe, prompt, steps=20, out_paths=f"gen_images/gen_img_{time.time()}.png")
     except Exception as e:
         print(f"Error loading model: {e}")
 
