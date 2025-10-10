@@ -5,6 +5,7 @@ import itertools
 import time
 import sys
 
+
 def run_ollama(prompt, model="llama3"):
     process = subprocess.Popen(
         ["ollama", "run", model],
@@ -47,8 +48,7 @@ if __name__ == "__main__":
         user_input = input("\nYou: ")
 
         prompt = f"""
-        Відповідай українською мовою. Якщо не знаєш відповіді, скажи "Не знаю". Ти локальний чат-бот.
-        Використовуй наступні знання для відповіді на питання: {knowledge}
+        Відповідай українською мовою.
         Питання користувача: {user_input}
         """
 
