@@ -94,5 +94,11 @@ model.save_pretrained(OUTPUT_DIR)
 
 print("Training complete. Saved to", OUTPUT_DIR)
 
+print("Use trained model for inference:")
+prompt = "В якій сім'ї народився проживав Гаррі Поттер?"
+inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+outputs = model.generate(**inputs, max_new_tokens=1000)
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+
 if __name__ == "__main__":
     print("Hello, World!")
