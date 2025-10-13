@@ -5,7 +5,7 @@ from peft import PeftModel
 # ===============================
 # ⚙️ 1. Конфігурація
 # ===============================
-BASE_MODEL = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"   # базова модель
+BASE_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"   # базова модель
 ADAPTER_PATH = "saved_models"                          # твоя збережена LoRA модель
 
 # ===============================

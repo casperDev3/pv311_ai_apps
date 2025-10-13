@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87a760c2-c85c-4be3-9e29-0e2db1c5c8ae" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/inference_lora.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/book.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/book.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inference_lora.py" beforeDir="false" afterPath="$PROJECT_DIR$/inference_lora.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,6 +15,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="generation-img-810-pv311" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -34,10 +38,10 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "finetune-llama-1310-pv311",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.inference_lora">
+  <component name="RunManager" selected="Python.main">
     <configuration name="inference_lora" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pv311_ai_apps" />
       <option name="ENV_FILES" value="" />
@@ -88,8 +92,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.inference_lora" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.inference_lora" />
       </list>
     </recent_temporary>
   </component>

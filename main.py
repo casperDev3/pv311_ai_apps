@@ -5,7 +5,7 @@ from peft import LoraConfig, get_peft_model # Використання PEFT дл
 from datasets import Dataset
 
 # Конфігурація
-MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
 BOOK_PATH = "data/book.txt"
 OUTPUT_DIR = "saved_models"
 
