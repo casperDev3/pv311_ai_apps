@@ -1,7 +1,7 @@
 import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
-from pref import LoraConfig, get_peft_model # Використання PEFT для LoRA адаптації
+from peft import LoraConfig, get_peft_model # Використання PEFT для LoRA адаптації
 from datasets import Dataset
 
 # Конфігурація
