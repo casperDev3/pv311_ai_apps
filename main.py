@@ -2,7 +2,7 @@ import os
 from openai import OpenAI
 from gtts import gTTS
 from dotenv import load_dotenv
-
+from torch.ao.quantization.backend_config.onednn import with_bn
 
 # setting up OpenAI client
 load_dotenv()
@@ -58,6 +58,7 @@ def chat_mode():
         )
         text = response.choices[0].message.content
         print("AI:", text)
+
 
 def main():
     print("Please choose an option:")
