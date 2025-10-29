@@ -190,7 +190,7 @@ def run_face_recognition(camera_id=0, photos_folder="photos"):
 
 if __name__ == "__main__":
     try:
-        run_face_recognition(camera_id=3, photos_folder="photos")
+        run_face_recognition(camera_id=2, photos_folder="photos")
     except KeyboardInterrupt:
         print("Робота перервана користувачем!")
     except Exception as err:
