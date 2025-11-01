@@ -137,4 +137,5 @@ class FaceRecognitionSystem:
 
 
 if __name__ == "__main__":
+    FaceRecognitionSystem.load_known_faces(FaceRecognitionSystem())
     print("Hello, World!")
